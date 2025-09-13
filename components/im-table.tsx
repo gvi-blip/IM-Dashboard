@@ -306,366 +306,501 @@ export function IMTable({
   }
 
   const renderIMAlertsTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-gradient-to-r from-secondary/20 via-card to-secondary/20 border-b border-border">
-          <TableHead className="font-semibold text-foreground">
-            <Button
-              variant="ghost"
-              className="h-auto p-0 font-semibold text-foreground hover:text-primary transition-colors"
-            >
-              Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
-            </Button>
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Index & Oth
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">Time</TableHead>
-          <TableHead className="font-semibold text-foreground">Type</TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Alert Detail
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">LTP</TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Baseline
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {currentData.map((row, index) => (
-          <TableRow
-            key={index}
-            className={`transition-colors hover:bg-primary/5 border-b border-border/50 ${
-              index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"
-            }`}
-          >
-            <TableCell className="font-medium">
-              <Button
-                variant="link"
-                className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
-              >
-                {row.symbol}
-              </Button>
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {row.indexOth || "Index"}
-            </TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">
-              {row.time || new Date(row.timestamp).toLocaleTimeString()}
-            </TableCell>
-            <TableCell>
-              <Badge
-                variant="secondary"
-                className={`${
-                  (row.type || row.signal).includes("R1")
-                    ? "bg-blue-600 text-white border-blue-500"
-                    : (row.type || row.signal).includes("R2")
-                    ? "bg-indigo-600 text-white border-indigo-500"
-                    : (row.type || row.signal).includes("S1")
-                    ? "bg-orange-600 text-white border-orange-500"
-                    : (row.type || row.signal).includes("S2")
-                    ? "bg-red-600 text-white border-red-500"
-                    : "bg-primary text-primary-foreground border-primary/30"
+    <div className="h-full min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableHeader>
+            <TableRow className="border-b border-border bg-[hsl(var(--secondary))]">
+              <TableHead className="font-semibold text-foreground rounded-tl-lg">
+                <Button
+                  variant="ghost"
+                  className="h-auto p-0 font-semibold text-foreground hover:text-primary transition-colors"
+                >
+                  Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
+                </Button>
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Index & Oth
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Time
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Type
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Alert Detail
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                LTP
+              </TableHead>
+              <TableHead className="font-semibold text-foreground rounded-tr-lg">
+                Baseline
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentData.map((row, index) => (
+              <TableRow
+                key={index}
+                className={`transition-colors hover:bg-primary/5 border-b border-border ${
+                  index % 2 === 0
+                    ? "bg-[hsl(var(--background))]"
+                    : "bg-[hsl(var(--secondary))]"
                 }`}
               >
-                {row.type || row.signal}
-              </Badge>
-            </TableCell>
-            <TableCell className="font-medium">
-              {row.alertDetail ||
-                `Vol: ${row.volume.toLocaleString()} | Change: ${
-                  row.change > 0 ? "+" : ""
-                }${row.change} (${row.changePercent > 0 ? "+" : ""}${
-                  row.changePercent
-                }%)`}
-            </TableCell>
-            <TableCell className="font-mono text-sm font-semibold text-foreground">
-              ₹{(row.ltp || row.price).toFixed(2)}
-            </TableCell>
-            <TableCell className="font-mono text-sm text-muted-foreground">
-              ₹{(row.baseline || row.price - row.change).toFixed(2)}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                <TableCell
+                  className={`font-medium ${
+                    index === currentData.length - 1 ? "rounded-bl-lg" : ""
+                  }`}
+                >
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
+                  >
+                    {row.symbol}
+                  </Button>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {row.indexOth || "Index"}
+                </TableCell>
+                <TableCell className="text-muted-foreground font-mono text-sm">
+                  {row.time || new Date(row.timestamp).toLocaleTimeString()}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="secondary"
+                    className={`${
+                      (row.type || row.signal).includes("R1")
+                        ? "bg-blue-600 text-white border-blue-500"
+                        : (row.type || row.signal).includes("R2")
+                        ? "bg-indigo-600 text-white border-indigo-500"
+                        : (row.type || row.signal).includes("S1")
+                        ? "bg-orange-600 text-white border-orange-500"
+                        : (row.type || row.signal).includes("S2")
+                        ? "bg-red-600 text-white border-red-500"
+                        : "bg-primary text-primary-foreground border-primary/30"
+                    }`}
+                  >
+                    {row.type || row.signal}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-medium">
+                  {row.alertDetail ||
+                    `Vol: ${row.volume.toLocaleString()} | Change: ${
+                      row.change > 0 ? "+" : ""
+                    }${row.change} (${row.changePercent > 0 ? "+" : ""}${
+                      row.changePercent
+                    }%)`}
+                </TableCell>
+                <TableCell className="font-mono text-sm font-semibold text-foreground">
+                  ₹{(row.ltp || row.price).toFixed(2)}
+                </TableCell>
+                <TableCell
+                  className={`font-mono text-sm text-muted-foreground ${
+                    index === currentData.length - 1 ? "rounded-br-lg" : ""
+                  }`}
+                >
+                  ₹{(row.baseline || row.price - row.change).toFixed(2)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 
   const renderIMHFAlertsTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-gradient-to-r from-secondary/20 via-card to-secondary/20 border-b border-border">
-          <TableHead className="font-semibold text-foreground">
-            <Button
-              variant="ghost"
-              className="h-auto p-0 font-semibold text-foreground hover:text-primary transition-colors"
-            >
-              Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
-            </Button>
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Index & Oth
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">Time</TableHead>
-          <TableHead className="font-semibold text-foreground">Type</TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Alert Detail
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">LTP</TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Baseline
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {currentData.map((row, index) => (
-          <TableRow
-            key={index}
-            className={`transition-colors hover:bg-primary/5 border-b border-border/50 ${
-              index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"
-            }`}
-          >
-            <TableCell className="font-medium">
-              <Button
-                variant="link"
-                className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
-              >
-                {row.symbol}
-              </Button>
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {row.indexOth || "Index"}
-            </TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">
-              {row.time || new Date(row.timestamp).toLocaleTimeString()}
-            </TableCell>
-            <TableCell>
-              <Badge
-                variant="secondary"
-                className={`${
-                  (row.type || row.signal).includes("OCP")
-                    ? "bg-blue-600 text-white border-blue-500"
-                    : (row.type || row.signal).includes("Matrix")
-                    ? "bg-purple-600 text-white border-purple-500"
-                    : (row.type || row.signal).includes("Up")
-                    ? "bg-green-600 text-white border-green-500"
-                    : (row.type || row.signal).includes("Value")
-                    ? "bg-orange-600 text-white border-orange-500"
-                    : (row.type || row.signal).includes("Point")
-                    ? "bg-indigo-600 text-white border-indigo-500"
-                    : "bg-primary text-primary-foreground border-primary/30"
+    <div className="h-full min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableHeader>
+            <TableRow className="border-b border-border">
+              <TableHead className="font-semibold text-foreground rounded-tl-lg">
+                <Button
+                  variant="ghost"
+                  className="h-auto p-0 font-semibold text-foreground hover:text-primary transition-colors"
+                >
+                  Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
+                </Button>
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Index & Oth
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Time
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Type
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Alert Detail
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                LTP
+              </TableHead>
+              <TableHead className="font-semibold text-foreground rounded-tr-lg">
+                Baseline
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableBody>
+            {currentData.map((row, index) => (
+              <TableRow
+                key={index}
+                className={`transition-colors hover:bg-primary/5 border-b border-border/50 ${
+                  index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"
                 }`}
               >
-                {row.type || row.signal}
-              </Badge>
-            </TableCell>
-            <TableCell className="font-medium">
-              {row.alertDetail ||
-                `Vol: ${row.volume.toLocaleString()} | Change: ${
-                  row.change > 0 ? "+" : ""
-                }${row.change} (${row.changePercent > 0 ? "+" : ""}${
-                  row.changePercent
-                }%)`}
-            </TableCell>
-            <TableCell className="font-mono text-sm font-semibold text-foreground">
-              ₹{(row.ltp || row.price).toFixed(2)}
-            </TableCell>
-            <TableCell className="font-mono text-sm text-muted-foreground">
-              ₹{(row.baseline || row.price - row.change).toFixed(2)}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                <TableCell
+                  className={`font-medium ${
+                    index === currentData.length - 1 ? "rounded-bl-lg" : ""
+                  }`}
+                >
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
+                  >
+                    {row.symbol}
+                  </Button>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {row.indexOth || "Index"}
+                </TableCell>
+                <TableCell className="text-muted-foreground font-mono text-sm">
+                  {row.time || new Date(row.timestamp).toLocaleTimeString()}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="secondary"
+                    className={`${
+                      (row.type || row.signal).includes("OCP")
+                        ? "bg-blue-600 text-white border-blue-500"
+                        : (row.type || row.signal).includes("Matrix")
+                        ? "bg-purple-600 text-white border-purple-500"
+                        : (row.type || row.signal).includes("Up")
+                        ? "bg-green-600 text-white border-green-500"
+                        : (row.type || row.signal).includes("Value")
+                        ? "bg-orange-600 text-white border-orange-500"
+                        : (row.type || row.signal).includes("Point")
+                        ? "bg-indigo-600 text-white border-indigo-500"
+                        : "bg-primary text-primary-foreground border-primary/30"
+                    }`}
+                  >
+                    {row.type || row.signal}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-medium">
+                  {row.alertDetail ||
+                    `Vol: ${row.volume.toLocaleString()} | Change: ${
+                      row.change > 0 ? "+" : ""
+                    }${row.change} (${row.changePercent > 0 ? "+" : ""}${
+                      row.changePercent
+                    }%)`}
+                </TableCell>
+                <TableCell className="font-mono text-sm font-semibold text-foreground">
+                  ₹{(row.ltp || row.price).toFixed(2)}
+                </TableCell>
+                <TableCell
+                  className={`font-mono text-sm text-muted-foreground ${
+                    index === currentData.length - 1 ? "rounded-br-lg" : ""
+                  }`}
+                >
+                  ₹{(row.baseline || row.price - row.change).toFixed(2)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 
   const renderIMMagicAlertsTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-gradient-to-r from-secondary/20 via-card to-secondary/20 border-b border-border">
-          <TableHead className="font-semibold text-foreground">
-            Symbol
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Index & Oth
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">WP</TableHead>
-          <TableHead className="font-semibold text-foreground">MP</TableHead>
-          {/* <TableHead className="font-semibold text-foreground">
-            Alert Detail
-          </TableHead> */}
-          {/* <TableHead className="font-semibold text-foreground">Time</TableHead> */}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {currentData.map((row, index) => (
-          <TableRow
-            key={index}
-            className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}
-          >
-            <TableCell className="font-medium">
-              <Button
-                variant="link"
-                className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
+    <div className="h-full min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableHeader>
+            <TableRow className="border-b border-border">
+              <TableHead className="font-semibold text-foreground rounded-tl-lg">
+                Symbol
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Index & Oth
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                WP
+              </TableHead>
+              <TableHead className="font-semibold text-foreground rounded-tr-lg">
+                MP
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableBody>
+            {currentData.map((row, index) => (
+              <TableRow
+                key={index}
+                className={
+                  index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"
+                }
               >
-                {row.symbol}
-              </Button>
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {row.indexOth || "Index"}
-            </TableCell>
-            <TableCell>
-              <Badge
-                variant="secondary"
-                className={`${
-                  (row.wp || row.wpSignal) === "Must"
-                    ? "bg-red-600 text-white border-red-500"
-                    : (row.wp || row.wpSignal) === "Watch"
-                    ? "bg-blue-600 text-white border-blue-500"
-                    : (row.wp || row.wpSignal) === "Close"
-                    ? "bg-orange-600 text-white border-orange-500"
-                    : (row.wp || row.wpSignal) === "Coming"
-                    ? "bg-green-600 text-white border-green-500"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {row.wp || row.wpSignal}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Badge
-                variant="secondary"
-                className={`${
-                  (row.mp || row.mpSignal) === "Must"
-                    ? "bg-red-600 text-white border-red-500"
-                    : (row.mp || row.mpSignal) === "Watch"
-                    ? "bg-blue-600 text-white border-blue-500"
-                    : (row.mp || row.mpSignal) === "Close"
-                    ? "bg-orange-600 text-white border-orange-500"
-                    : (row.mp || row.mpSignal) === "Coming"
-                    ? "bg-green-600 text-white border-green-500"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {row.mp || row.mpSignal}
-              </Badge>
-            </TableCell>
-            {/* <TableCell className="font-medium">{row.alertDetail}</TableCell> */}
-            {/* <TableCell className="text-muted-foreground font-mono text-sm">{row.time}</TableCell> */}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                <TableCell
+                  className={`font-medium ${
+                    index === currentData.length - 1 ? "rounded-bl-lg" : ""
+                  }`}
+                >
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
+                  >
+                    {row.symbol}
+                  </Button>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {row.indexOth || "Index"}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="secondary"
+                    className={`${
+                      (row.wp || row.wpSignal) === "Must"
+                        ? "bg-red-600 text-white border-red-500"
+                        : (row.wp || row.wpSignal) === "Watch"
+                        ? "bg-blue-600 text-white border-blue-500"
+                        : (row.wp || row.wpSignal) === "Close"
+                        ? "bg-orange-600 text-white border-orange-500"
+                        : (row.wp || row.wpSignal) === "Coming"
+                        ? "bg-green-600 text-white border-green-500"
+                        : "bg-secondary text-secondary-foreground"
+                    }`}
+                  >
+                    {row.wp || row.wpSignal}
+                  </Badge>
+                </TableCell>
+                <TableCell
+                  className={`${
+                    index === currentData.length - 1 ? "rounded-br-lg" : ""
+                  }`}
+                >
+                  <Badge
+                    variant="secondary"
+                    className={`${
+                      (row.mp || row.mpSignal) === "Must"
+                        ? "bg-red-600 text-white border-red-500"
+                        : (row.mp || row.mpSignal) === "Watch"
+                        ? "bg-blue-600 text-white border-blue-500"
+                        : (row.mp || row.mpSignal) === "Close"
+                        ? "bg-orange-600 text-white border-orange-500"
+                        : (row.mp || row.mpSignal) === "Coming"
+                        ? "bg-green-600 text-white border-green-500"
+                        : "bg-secondary text-secondary-foreground"
+                    }`}
+                  >
+                    {row.mp || row.mpSignal}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 
   const renderStockListFilterTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-gradient-to-r from-secondary/20 via-card to-secondary/20 border-b border-border">
-          <TableHead className="font-semibold text-foreground">
-            Symbol
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Index & Oth
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">Type</TableHead>
-          <TableHead className="font-semibold text-foreground">WP</TableHead>
-          <TableHead className="font-semibold text-foreground">MP</TableHead>
-          <TableHead className="font-semibold text-foreground">
-            Alert Detail
-          </TableHead>
-          <TableHead className="font-semibold text-foreground">Time</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {currentData.map((row, index) => (
-          <TableRow
-            key={index}
-            className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}
-          >
-            <TableCell className="font-medium">
-              <Button
-                variant="link"
-                className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
+    <div className="h-full min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableHeader>
+            <TableRow className="border-b border-border">
+              <TableHead className="font-semibold text-foreground rounded-tl-lg">
+                Symbol
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Index & Oth
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Type
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                WP
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                MP
+              </TableHead>
+              <TableHead className="font-semibold text-foreground">
+                Alert Detail
+              </TableHead>
+              <TableHead className="font-semibold text-foreground rounded-tr-lg">
+                Time
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+        <Table className="w-full">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <TableBody>
+            {currentData.map((row, index) => (
+              <TableRow
+                key={index}
+                className={
+                  index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"
+                }
               >
-                {row.symbol}
-              </Button>
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {row.indexOth}
-            </TableCell>
-            <TableCell>
-              {"type" in row ? (
-                <Badge
-                  variant="secondary"
-                  className="bg-primary text-primary-foreground border-primary/30"
-                >
-                  {row.type}
-                </Badge>
-              ) : (
-                "-"
-              )}
-            </TableCell>
-            <TableCell>
-              {"wp" in row ? (
-                <Badge
-                  variant={
-                    row.wp === "Must"
-                      ? "destructive"
-                      : row.wp === "Watch"
-                      ? "default"
-                      : "outline"
-                  }
-                  className={`${
-                    row.wp === "Must"
-                      ? "bg-red-600 text-white"
-                      : row.wp === "Watch"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
+                <TableCell
+                  className={`font-medium ${
+                    index === currentData.length - 1 ? "rounded-bl-lg" : ""
                   }`}
                 >
-                  {row.wp}
-                </Badge>
-              ) : (
-                "-"
-              )}
-            </TableCell>
-            <TableCell>
-              {"mp" in row ? (
-                <Badge
-                  variant={
-                    row.mp === "Must"
-                      ? "destructive"
-                      : row.mp === "Watch"
-                      ? "default"
-                      : "outline"
-                  }
-                  className={`${
-                    row.mp === "Must"
-                      ? "bg-red-600 text-white"
-                      : row.mp === "Watch"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 font-semibold text-primary hover:text-accent transition-colors"
+                  >
+                    {row.symbol}
+                  </Button>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {row.indexOth}
+                </TableCell>
+                <TableCell>
+                  {"type" in row ? (
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary text-primary-foreground border-primary/30"
+                    >
+                      {row.type}
+                    </Badge>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell>
+                  {"wp" in row ? (
+                    <Badge
+                      variant={
+                        row.wp === "Must"
+                          ? "destructive"
+                          : row.wp === "Watch"
+                          ? "default"
+                          : "outline"
+                      }
+                      className={`${
+                        row.wp === "Must"
+                          ? "bg-red-600 text-white"
+                          : row.wp === "Watch"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      {row.wp}
+                    </Badge>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell>
+                  {"mp" in row ? (
+                    <Badge
+                      variant={
+                        row.mp === "Must"
+                          ? "destructive"
+                          : row.mp === "Watch"
+                          ? "default"
+                          : "outline"
+                      }
+                      className={`${
+                        row.mp === "Must"
+                          ? "bg-red-600 text-white"
+                          : row.mp === "Watch"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      {row.mp}
+                    </Badge>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell className="font-medium">{row.alertDetail}</TableCell>
+                <TableCell
+                  className={`text-muted-foreground font-mono text-sm ${
+                    index === currentData.length - 1 ? "rounded-br-lg" : ""
                   }`}
                 >
-                  {row.mp}
-                </Badge>
-              ) : (
-                "-"
-              )}
-            </TableCell>
-            <TableCell className="font-medium">{row.alertDetail}</TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">
-              {row.time}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                  {row.time}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 
   return (
-    <div className="overflow-x-auto bg-gradient-to-b from-background to-secondary/5">
+    <div className="h-full flex flex-col bg-gradient-to-b from-background to-secondary/5 overflow-hidden rounded-lg">
       {activeTab === "im-alerts" && renderIMAlertsTable()}
       {activeTab === "im-hf-alerts" && renderIMHFAlertsTable()}
       {activeTab === "im-magic-alerts" && renderIMMagicAlertsTable()}

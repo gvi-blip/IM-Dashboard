@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -19,6 +20,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import {
   Popover,
@@ -26,18 +30,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
   SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
-  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
@@ -51,9 +45,11 @@ import {
   Moon,
   Settings,
   WandSparkles,
+  ChevronsUpDown,
 } from "lucide-react";
 import { IMTable } from "./im-table";
 import { FilterControls } from "./filter-controls";
+import { AppSidebar } from "./app-sidebar";
 
 type TabType =
   | "im-alerts"
@@ -85,7 +81,7 @@ export function IMDashboard() {
   const [timeInterval, setTimeInterval] = useState("09:00-10:30");
   const [nifty50Enabled, setNifty50Enabled] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark" | "system">("dark");
 
   // Data states
   const [data, setData] = useState<ApiResponse | null>(null);
@@ -104,19 +100,37 @@ export function IMDashboard() {
   // Refs for intervals
   const autoRefreshInterval = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const savedTheme =
-      (localStorage.getItem("dashboard-theme") as "light" | "dark") || "dark";
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle("light", savedTheme === "light");
+  const applyTheme = useCallback((mode: "light" | "dark" | "system") => {
+    try {
+      const prefersLight =
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: light)").matches;
+      const isLight = mode === "light" || (mode === "system" && prefersLight);
+      document.documentElement.classList.toggle("light", isLight);
+    } catch (_) {
+      document.documentElement.classList.toggle("light", mode === "light");
+    }
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("dashboard-theme", newTheme);
-    document.documentElement.classList.toggle("light", newTheme === "light");
-  };
+  useEffect(() => {
+    const saved =
+      (localStorage.getItem("dashboard-theme") as
+        | "light"
+        | "dark"
+        | "system") || "dark";
+    setTheme(saved);
+    applyTheme(saved);
+  }, [applyTheme]);
+
+  const setThemeMode = useCallback(
+    (mode: "light" | "dark" | "system") => {
+      setTheme(mode);
+      localStorage.setItem("dashboard-theme", mode);
+      applyTheme(mode);
+    },
+    [applyTheme]
+  );
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -201,139 +215,17 @@ export function IMDashboard() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-background flex w-full">
-        {/* Replace custom sidebar with shadcn Sidebar component */}
-        <Sidebar collapsible="icon" className="border-r">
-          <SidebarHeader>
-            <div className={`flex items-center gap-3`}>
-              <div className="flex-shrink-0 h-8 w-8 rounded-lg flex items-center justify-center">
-                <img src="/IM.png" alt="IM Capital" className="h-8 w-8" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">IM Capital</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  Investment Management
-                </span>
-              </div>
-            </div>
-          </SidebarHeader>
-
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <SidebarMenuItem key={tab.id}>
-                        <SidebarMenuButton
-                          onClick={() => setActiveTab(tab.id as TabType)}
-                          isActive={activeTab === tab.id}
-                          tooltip={tab.label}
-                          className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground hover:bg-secondary/50"
-                        >
-                          <Icon className="h-4 w-4" />
-                          <span>{tab.label}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-
-          <SidebarFooter>
-            <SidebarSeparator />
-            <SidebarMenu>
-              {/* Settings Menu Item */}
-              <SidebarMenuItem>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <SidebarMenuButton
-                      tooltip="Settings"
-                      className="hover:bg-secondary/50"
-                    >
-                      <Settings className="h-4 w-4" />
-                      <span>Settings</span>
-                    </SidebarMenuButton>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="top"
-                    align="start"
-                    className="w-56 p-1"
-                    sideOffset={8}
-                  >
-                    <Button
-                      variant="ghost"
-                      onClick={toggleTheme}
-                      className="w-full justify-start cursor-pointer hover:bg-secondary/50"
-                    >
-                      {theme === "dark" ? (
-                        <Sun className="mr-2 h-4 w-4" />
-                      ) : (
-                        <Moon className="mr-2 h-4 w-4" />
-                      )}
-                      <span>{theme === "dark" ? "Light" : "Dark"} Theme</span>
-                    </Button>
-                  </PopoverContent>
-                </Popover>
-              </SidebarMenuItem>
-
-              {/* User Menu Item */}
-              <SidebarMenuItem>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <SidebarMenuButton
-                      tooltip="User Account"
-                      className="hover:bg-secondary/50"
-                    >
-                      <div className="relative">
-                        <Avatar className="h-4 w-4 ring-1 ring-primary/20">
-                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground font-semibold text-xs">
-                            <User className="h-3 w-3" />
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 bg-green-500 rounded-full border border-background"></div>
-                      </div>
-                      <span>Portfolio Manager</span>
-                    </SidebarMenuButton>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="top"
-                    align="start"
-                    className="w-56 p-2"
-                    sideOffset={8}
-                  >
-                    <div className="space-y-2">
-                      <div className="flex flex-col space-y-1 px-2 py-1">
-                        <p className="text-sm font-medium leading-none">
-                          Portfolio Manager
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          manager@imcapital.com
-                        </p>
-                      </div>
-                      <div className="border-t pt-2">
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start cursor-pointer hover:bg-secondary/50 text-red-600 hover:text-red-600"
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Log out</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
+      <div className="h-screen bg-background flex w-full overflow-hidden">
+        <AppSidebar
+          activeTab={activeTab}
+          onSelectTab={(t) => setActiveTab(t)}
+          theme={theme}
+          onThemeChange={setThemeMode}
+        />
         {/* Replace main content div with SidebarInset */}
-        <SidebarInset>
+        <SidebarInset className="flex flex-col h-screen min-h-0">
           {/* Header */}
-          <header className="border-b border-border bg-gradient-to-r from-card via-card to-secondary/10 backdrop-blur-sm">
+          <header className="flex-shrink-0 border-b border-border bg-gradient-to-r from-card via-card to-secondary/10 backdrop-blur-sm">
             <div className="flex items-center justify-between px-6 py-4">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="-ml-1" />
@@ -387,18 +279,20 @@ export function IMDashboard() {
           </header>
 
           {/* Filter Controls */}
-          <FilterControls
-            activeTab={activeTab}
-            timeInterval={timeInterval}
-            onTimeIntervalChange={setTimeInterval}
-            nifty50Enabled={nifty50Enabled}
-            onNifty50Change={setNifty50Enabled}
-            onFiltersChange={handleFiltersChange}
-          />
+          <div className="flex-shrink-0">
+            <FilterControls
+              activeTab={activeTab}
+              timeInterval={timeInterval}
+              onTimeIntervalChange={setTimeInterval}
+              nifty50Enabled={nifty50Enabled}
+              onNifty50Change={setNifty50Enabled}
+              onFiltersChange={handleFiltersChange}
+            />
+          </div>
 
           {/* Table Content */}
-          <div className="px-6 py-6">
-            <Card className="overflow-hidden border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">
+          <div className="flex-1 min-h-0 px-6 py-6">
+            <Card className="p-0 h-full min-h-0 flex flex-col border border-border shadow-sm bg-card rounded-lg">
               <IMTable
                 activeTab={activeTab}
                 data={data}
