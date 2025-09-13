@@ -34,7 +34,7 @@
   --sidebar-foreground: #ffffff; /* Sidebar text color */
   --sidebar-primary: #3b82f6; /* Primary accent for sidebar elements */
   --sidebar-primary-foreground: #ffffff; /* Text color for primary sidebar elements */
-  --sidebar-accent: #f97316; /* Accent for highlighted sidebar items */
+  --sidebar-accent: #334155; /* slate-700: subtle highlight (dark) */
   --sidebar-accent-foreground: #ffffff; /* Text color for sidebar accent items */
   --sidebar-border: #374151; /* Border color for sidebar */
   --sidebar-ring: rgba(59, 130, 246, 0.5); /* Ring color for sidebar focus */
@@ -70,7 +70,7 @@
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f97316;
+  --sidebar-accent: #334155; /* slate-700 */
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #374151;
   --sidebar-ring: rgba(59, 130, 246, 0.5);
