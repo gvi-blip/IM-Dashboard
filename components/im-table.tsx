@@ -1,14 +1,25 @@
-"use client"
+"use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowUpDown } from "lucide-react"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown } from "lucide-react";
 
-type TabType = "im-alerts" | "im-hf-alerts" | "im-magic-alerts" | "stock-list-filter"
+type TabType =
+  | "im-alerts"
+  | "im-hf-alerts"
+  | "im-magic-alerts"
+  | "stock-list-filter";
 
 interface IMTableProps {
-  activeTab: TabType
+  activeTab: TabType;
 }
 
 // Sample data for different tabs
@@ -49,7 +60,7 @@ const imAlertsData = [
     ltp: "1,458.10",
     baseline: "1,465.00",
   },
-]
+];
 
 const imHfAlertsData = [
   {
@@ -88,7 +99,7 @@ const imHfAlertsData = [
     ltp: "1,247.20",
     baseline: "1,240.00",
   },
-]
+];
 
 const imMagicAlertsData = [
   {
@@ -107,7 +118,7 @@ const imMagicAlertsData = [
     alertDetail: "Approaching key resistance",
     time: "10:30 AM",
   },
-]
+];
 
 export function IMTable({ activeTab }: IMTableProps) {
   const renderIMAlertsTable = () => (
@@ -122,12 +133,18 @@ export function IMTable({ activeTab }: IMTableProps) {
               Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
             </Button>
           </TableHead>
-          <TableHead className="font-semibold text-foreground">Index & Oth</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Index & Oth
+          </TableHead>
           <TableHead className="font-semibold text-foreground">Time</TableHead>
           <TableHead className="font-semibold text-foreground">Type</TableHead>
-          <TableHead className="font-semibold text-foreground">Alert Detail</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Alert Detail
+          </TableHead>
           <TableHead className="font-semibold text-foreground">LTP</TableHead>
-          <TableHead className="font-semibold text-foreground">BaseLine</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            BaseLine
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -146,8 +163,12 @@ export function IMTable({ activeTab }: IMTableProps) {
                 {row.symbol}
               </Button>
             </TableCell>
-            <TableCell className="text-muted-foreground">{row.indexOth}</TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">{row.time}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {row.indexOth}
+            </TableCell>
+            <TableCell className="text-muted-foreground font-mono text-sm">
+              {row.time}
+            </TableCell>
             <TableCell>
               <Badge
                 variant="secondary"
@@ -155,25 +176,29 @@ export function IMTable({ activeTab }: IMTableProps) {
                   row.type.includes("R1")
                     ? "bg-blue-600 text-white border-blue-500"
                     : row.type.includes("R2")
-                      ? "bg-indigo-600 text-white border-indigo-500"
-                      : row.type.includes("S1")
-                        ? "bg-orange-600 text-white border-orange-500"
-                        : row.type.includes("S2")
-                          ? "bg-red-600 text-white border-red-500"
-                          : "bg-primary text-primary-foreground border-primary/30"
+                    ? "bg-indigo-600 text-white border-indigo-500"
+                    : row.type.includes("S1")
+                    ? "bg-orange-600 text-white border-orange-500"
+                    : row.type.includes("S2")
+                    ? "bg-red-600 text-white border-red-500"
+                    : "bg-primary text-primary-foreground border-primary/30"
                 }`}
               >
                 {row.type}
               </Badge>
             </TableCell>
             <TableCell className="font-medium">{row.alertDetail}</TableCell>
-            <TableCell className="font-mono text-sm font-semibold text-foreground">{row.ltp}</TableCell>
-            <TableCell className="font-mono text-sm text-muted-foreground">{row.baseline}</TableCell>
+            <TableCell className="font-mono text-sm font-semibold text-foreground">
+              {row.ltp}
+            </TableCell>
+            <TableCell className="font-mono text-sm text-muted-foreground">
+              {row.baseline}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  )
+  );
 
   const renderIMHFAlertsTable = () => (
     <Table>
@@ -187,12 +212,18 @@ export function IMTable({ activeTab }: IMTableProps) {
               Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
             </Button>
           </TableHead>
-          <TableHead className="font-semibold text-foreground">Index & Oth</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Index & Oth
+          </TableHead>
           <TableHead className="font-semibold text-foreground">Time</TableHead>
           <TableHead className="font-semibold text-foreground">Type</TableHead>
-          <TableHead className="font-semibold text-foreground">Alert Detail</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Alert Detail
+          </TableHead>
           <TableHead className="font-semibold text-foreground">LTP</TableHead>
-          <TableHead className="font-semibold text-foreground">BaseLine</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            BaseLine
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -211,8 +242,12 @@ export function IMTable({ activeTab }: IMTableProps) {
                 {row.symbol}
               </Button>
             </TableCell>
-            <TableCell className="text-muted-foreground">{row.indexOth}</TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">{row.time}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {row.indexOth}
+            </TableCell>
+            <TableCell className="text-muted-foreground font-mono text-sm">
+              {row.time}
+            </TableCell>
             <TableCell>
               <Badge
                 variant="secondary"
@@ -220,41 +255,54 @@ export function IMTable({ activeTab }: IMTableProps) {
                   row.type.includes("OCP")
                     ? "bg-blue-600 text-white border-blue-500"
                     : row.type.includes("Matrix")
-                      ? "bg-purple-600 text-white border-purple-500"
-                      : row.type.includes("Up")
-                        ? "bg-green-600 text-white border-green-500"
-                        : row.type.includes("Fall")
-                          ? "bg-red-600 text-white border-red-500"
-                          : "bg-primary text-primary-foreground border-primary/30"
+                    ? "bg-purple-600 text-white border-purple-500"
+                    : row.type.includes("Up")
+                    ? "bg-green-600 text-white border-green-500"
+                    : row.type.includes("Fall")
+                    ? "bg-red-600 text-white border-red-500"
+                    : "bg-primary text-primary-foreground border-primary/30"
                 }`}
               >
                 {row.type}
               </Badge>
             </TableCell>
             <TableCell className="font-medium">{row.alertDetail}</TableCell>
-            <TableCell className="font-mono text-sm font-semibold text-foreground">{row.ltp}</TableCell>
-            <TableCell className="font-mono text-sm text-muted-foreground">{row.baseline}</TableCell>
+            <TableCell className="font-mono text-sm font-semibold text-foreground">
+              {row.ltp}
+            </TableCell>
+            <TableCell className="font-mono text-sm text-muted-foreground">
+              {row.baseline}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  )
+  );
 
   const renderIMMagicAlertsTable = () => (
     <Table>
       <TableHeader>
         <TableRow className="bg-gradient-to-r from-secondary/20 via-card to-secondary/20 border-b border-border">
-          <TableHead className="font-semibold text-foreground">Symbol</TableHead>
-          <TableHead className="font-semibold text-foreground">Index & Oth</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Symbol
+          </TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Index & Oth
+          </TableHead>
           <TableHead className="font-semibold text-foreground">WP</TableHead>
           <TableHead className="font-semibold text-foreground">MP</TableHead>
-          <TableHead className="font-semibold text-foreground">Alert Detail</TableHead>
-          <TableHead className="font-semibold text-foreground">Time</TableHead>
+          {/* <TableHead className="font-semibold text-foreground">
+            Alert Detail
+          </TableHead> */}
+          {/* <TableHead className="font-semibold text-foreground">Time</TableHead> */}
         </TableRow>
       </TableHeader>
       <TableBody>
         {imMagicAlertsData.map((row, index) => (
-          <TableRow key={index} className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}>
+          <TableRow
+            key={index}
+            className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}
+          >
             <TableCell className="font-medium">
               <Button
                 variant="link"
@@ -263,16 +311,24 @@ export function IMTable({ activeTab }: IMTableProps) {
                 {row.symbol}
               </Button>
             </TableCell>
-            <TableCell className="text-muted-foreground">{row.indexOth}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {row.indexOth}
+            </TableCell>
             <TableCell>
               <Badge
-                variant={row.wp === "Must" ? "destructive" : row.wp === "Watch" ? "default" : "outline"}
+                variant={
+                  row.wp === "Must"
+                    ? "destructive"
+                    : row.wp === "Watch"
+                    ? "default"
+                    : "outline"
+                }
                 className={`${
                   row.wp === "Must"
                     ? "bg-red-600 text-white"
                     : row.wp === "Watch"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
                 }`}
               >
                 {row.wp}
@@ -280,42 +336,57 @@ export function IMTable({ activeTab }: IMTableProps) {
             </TableCell>
             <TableCell>
               <Badge
-                variant={row.mp === "Must" ? "destructive" : row.mp === "Watch" ? "default" : "outline"}
+                variant={
+                  row.mp === "Must"
+                    ? "destructive"
+                    : row.mp === "Watch"
+                    ? "default"
+                    : "outline"
+                }
                 className={`${
                   row.mp === "Must"
                     ? "bg-red-600 text-white"
                     : row.mp === "Watch"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
                 }`}
               >
                 {row.mp}
               </Badge>
             </TableCell>
-            <TableCell className="font-medium">{row.alertDetail}</TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">{row.time}</TableCell>
+            {/* <TableCell className="font-medium">{row.alertDetail}</TableCell> */}
+            {/* <TableCell className="text-muted-foreground font-mono text-sm">{row.time}</TableCell> */}
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  )
+  );
 
   const renderStockListFilterTable = () => (
     <Table>
       <TableHeader>
         <TableRow className="bg-gradient-to-r from-secondary/20 via-card to-secondary/20 border-b border-border">
-          <TableHead className="font-semibold text-foreground">Symbol</TableHead>
-          <TableHead className="font-semibold text-foreground">Index & Oth</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Symbol
+          </TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Index & Oth
+          </TableHead>
           <TableHead className="font-semibold text-foreground">Type</TableHead>
           <TableHead className="font-semibold text-foreground">WP</TableHead>
           <TableHead className="font-semibold text-foreground">MP</TableHead>
-          <TableHead className="font-semibold text-foreground">Alert Detail</TableHead>
+          <TableHead className="font-semibold text-foreground">
+            Alert Detail
+          </TableHead>
           <TableHead className="font-semibold text-foreground">Time</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {[...imAlertsData, ...imMagicAlertsData].map((row, index) => (
-          <TableRow key={index} className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}>
+          <TableRow
+            key={index}
+            className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}
+          >
             <TableCell className="font-medium">
               <Button
                 variant="link"
@@ -324,10 +395,15 @@ export function IMTable({ activeTab }: IMTableProps) {
                 {row.symbol}
               </Button>
             </TableCell>
-            <TableCell className="text-muted-foreground">{row.indexOth}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {row.indexOth}
+            </TableCell>
             <TableCell>
               {"type" in row ? (
-                <Badge variant="secondary" className="bg-primary text-primary-foreground border-primary/30">
+                <Badge
+                  variant="secondary"
+                  className="bg-primary text-primary-foreground border-primary/30"
+                >
                   {row.type}
                 </Badge>
               ) : (
@@ -337,13 +413,19 @@ export function IMTable({ activeTab }: IMTableProps) {
             <TableCell>
               {"wp" in row ? (
                 <Badge
-                  variant={row.wp === "Must" ? "destructive" : row.wp === "Watch" ? "default" : "outline"}
+                  variant={
+                    row.wp === "Must"
+                      ? "destructive"
+                      : row.wp === "Watch"
+                      ? "default"
+                      : "outline"
+                  }
                   className={`${
                     row.wp === "Must"
                       ? "bg-red-600 text-white"
                       : row.wp === "Watch"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
                   }`}
                 >
                   {row.wp}
@@ -355,13 +437,19 @@ export function IMTable({ activeTab }: IMTableProps) {
             <TableCell>
               {"mp" in row ? (
                 <Badge
-                  variant={row.mp === "Must" ? "destructive" : row.mp === "Watch" ? "default" : "outline"}
+                  variant={
+                    row.mp === "Must"
+                      ? "destructive"
+                      : row.mp === "Watch"
+                      ? "default"
+                      : "outline"
+                  }
                   className={`${
                     row.mp === "Must"
                       ? "bg-red-600 text-white"
                       : row.mp === "Watch"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
                   }`}
                 >
                   {row.mp}
@@ -371,12 +459,14 @@ export function IMTable({ activeTab }: IMTableProps) {
               )}
             </TableCell>
             <TableCell className="font-medium">{row.alertDetail}</TableCell>
-            <TableCell className="text-muted-foreground font-mono text-sm">{row.time}</TableCell>
+            <TableCell className="text-muted-foreground font-mono text-sm">
+              {row.time}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  )
+  );
 
   return (
     <div className="overflow-x-auto bg-gradient-to-b from-background to-secondary/5">
@@ -385,5 +475,5 @@ export function IMTable({ activeTab }: IMTableProps) {
       {activeTab === "im-magic-alerts" && renderIMMagicAlertsTable()}
       {activeTab === "stock-list-filter" && renderStockListFilterTable()}
     </div>
-  )
+  );
 }
