@@ -151,11 +151,6 @@ export function AppSidebar({
       label: "IM Magic Alerts",
       icon: WandSparkles,
     },
-    {
-      id: "stock-list-filter" as const,
-      label: "Stock List Filter",
-      icon: BarChart3,
-    },
   ];
 
   return (
