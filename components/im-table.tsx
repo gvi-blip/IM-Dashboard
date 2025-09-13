@@ -237,7 +237,7 @@ export function IMTable({
           </TableHead>
           <TableHead className="font-semibold text-foreground">LTP</TableHead>
           <TableHead className="font-semibold text-foreground">
-            BaseLine
+            Baseline
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -257,39 +257,43 @@ export function IMTable({
                 {row.symbol}
               </Button>
             </TableCell>
-            <TableCell className="text-muted-foreground">NIFTY 50</TableCell>
+            <TableCell className="text-muted-foreground">
+              {row.indexOth || "Index"}
+            </TableCell>
             <TableCell className="text-muted-foreground font-mono text-sm">
-              {new Date(row.timestamp).toLocaleTimeString()}
+              {row.time || new Date(row.timestamp).toLocaleTimeString()}
             </TableCell>
             <TableCell>
               <Badge
                 variant="secondary"
                 className={`${
-                  row.signal.includes("R1")
+                  (row.type || row.signal).includes("R1")
                     ? "bg-blue-600 text-white border-blue-500"
-                    : row.signal.includes("R2")
+                    : (row.type || row.signal).includes("R2")
                     ? "bg-indigo-600 text-white border-indigo-500"
-                    : row.signal.includes("S1")
+                    : (row.type || row.signal).includes("S1")
                     ? "bg-orange-600 text-white border-orange-500"
-                    : row.signal.includes("S2")
+                    : (row.type || row.signal).includes("S2")
                     ? "bg-red-600 text-white border-red-500"
                     : "bg-primary text-primary-foreground border-primary/30"
                 }`}
               >
-                {row.signal}
+                {row.type || row.signal}
               </Badge>
             </TableCell>
             <TableCell className="font-medium">
-              Vol: {row.volume.toLocaleString()} | Change:{" "}
-              {row.change > 0 ? "+" : ""}
-              {row.change} ({row.changePercent > 0 ? "+" : ""}
-              {row.changePercent}%)
+              {row.alertDetail ||
+                `Vol: ${row.volume.toLocaleString()} | Change: ${
+                  row.change > 0 ? "+" : ""
+                }${row.change} (${row.changePercent > 0 ? "+" : ""}${
+                  row.changePercent
+                }%)`}
             </TableCell>
             <TableCell className="font-mono text-sm font-semibold text-foreground">
-              ₹{row.price.toFixed(2)}
+              ₹{(row.ltp || row.price).toFixed(2)}
             </TableCell>
             <TableCell className="font-mono text-sm text-muted-foreground">
-              ₹{(row.price - row.change).toFixed(2)}
+              ₹{(row.baseline || row.price - row.change).toFixed(2)}
             </TableCell>
           </TableRow>
         ))}
@@ -319,7 +323,7 @@ export function IMTable({
           </TableHead>
           <TableHead className="font-semibold text-foreground">LTP</TableHead>
           <TableHead className="font-semibold text-foreground">
-            BaseLine
+            Baseline
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -340,35 +344,44 @@ export function IMTable({
               </Button>
             </TableCell>
             <TableCell className="text-muted-foreground">
-              {row.indexOth}
+              {row.indexOth || "Index"}
             </TableCell>
             <TableCell className="text-muted-foreground font-mono text-sm">
-              {row.time}
+              {row.time || new Date(row.timestamp).toLocaleTimeString()}
             </TableCell>
             <TableCell>
               <Badge
                 variant="secondary"
                 className={`${
-                  row?.type?.includes("OCP")
+                  (row.type || row.signal).includes("OCP")
                     ? "bg-blue-600 text-white border-blue-500"
-                    : row?.type?  .includes("Matrix")
+                    : (row.type || row.signal).includes("Matrix")
                     ? "bg-purple-600 text-white border-purple-500"
-                    : row?.type?.includes("Up")
+                    : (row.type || row.signal).includes("Up")
                     ? "bg-green-600 text-white border-green-500"
-                    : row?.type?.includes("Fall")
-                    ? "bg-red-600 text-white border-red-500"
+                    : (row.type || row.signal).includes("Value")
+                    ? "bg-orange-600 text-white border-orange-500"
+                    : (row.type || row.signal).includes("Point")
+                    ? "bg-indigo-600 text-white border-indigo-500"
                     : "bg-primary text-primary-foreground border-primary/30"
                 }`}
               >
-                {row.type}
+                {row.type || row.signal}
               </Badge>
             </TableCell>
-            <TableCell className="font-medium">{row.alertDetail}</TableCell>
+            <TableCell className="font-medium">
+              {row.alertDetail ||
+                `Vol: ${row.volume.toLocaleString()} | Change: ${
+                  row.change > 0 ? "+" : ""
+                }${row.change} (${row.changePercent > 0 ? "+" : ""}${
+                  row.changePercent
+                }%)`}
+            </TableCell>
             <TableCell className="font-mono text-sm font-semibold text-foreground">
-              {row.ltp}
+              ₹{(row.ltp || row.price).toFixed(2)}
             </TableCell>
             <TableCell className="font-mono text-sm text-muted-foreground">
-              {row.baseline}
+              ₹{(row.baseline || row.price - row.change).toFixed(2)}
             </TableCell>
           </TableRow>
         ))}
@@ -409,46 +422,42 @@ export function IMTable({
               </Button>
             </TableCell>
             <TableCell className="text-muted-foreground">
-              {row.indexOth}
+              {row.indexOth || "Index"}
             </TableCell>
             <TableCell>
               <Badge
-                variant={
-                  row.wp === "Must"
-                    ? "destructive"
-                    : row.wp === "Watch"
-                    ? "default"
-                    : "outline"
-                }
+                variant="secondary"
                 className={`${
-                  row.wp === "Must"
-                    ? "bg-red-600 text-white"
-                    : row.wp === "Watch"
-                    ? "bg-primary text-primary-foreground"
+                  (row.wp || row.wpSignal) === "Must"
+                    ? "bg-red-600 text-white border-red-500"
+                    : (row.wp || row.wpSignal) === "Watch"
+                    ? "bg-blue-600 text-white border-blue-500"
+                    : (row.wp || row.wpSignal) === "Close"
+                    ? "bg-orange-600 text-white border-orange-500"
+                    : (row.wp || row.wpSignal) === "Coming"
+                    ? "bg-green-600 text-white border-green-500"
                     : "bg-secondary text-secondary-foreground"
                 }`}
               >
-                {row.wp}
+                {row.wp || row.wpSignal}
               </Badge>
             </TableCell>
             <TableCell>
               <Badge
-                variant={
-                  row.mp === "Must"
-                    ? "destructive"
-                    : row.mp === "Watch"
-                    ? "default"
-                    : "outline"
-                }
+                variant="secondary"
                 className={`${
-                  row.mp === "Must"
-                    ? "bg-red-600 text-white"
-                    : row.mp === "Watch"
-                    ? "bg-primary text-primary-foreground"
+                  (row.mp || row.mpSignal) === "Must"
+                    ? "bg-red-600 text-white border-red-500"
+                    : (row.mp || row.mpSignal) === "Watch"
+                    ? "bg-blue-600 text-white border-blue-500"
+                    : (row.mp || row.mpSignal) === "Close"
+                    ? "bg-orange-600 text-white border-orange-500"
+                    : (row.mp || row.mpSignal) === "Coming"
+                    ? "bg-green-600 text-white border-green-500"
                     : "bg-secondary text-secondary-foreground"
                 }`}
               >
-                {row.mp}
+                {row.mp || row.mpSignal}
               </Badge>
             </TableCell>
             {/* <TableCell className="font-medium">{row.alertDetail}</TableCell> */}
