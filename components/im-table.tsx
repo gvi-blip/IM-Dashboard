@@ -18,8 +18,31 @@ type TabType =
   | "im-magic-alerts"
   | "stock-list-filter";
 
+interface AlertData {
+  id: string;
+  timestamp: string;
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  signal: string;
+  [key: string]: any;
+}
+
+interface ApiResponse {
+  im_alerts: AlertData[];
+  im_hf_alerts: AlertData[];
+  im_magic_alerts: AlertData[];
+  timestamp: string;
+}
+
 interface IMTableProps {
   activeTab: TabType;
+  data: ApiResponse | null;
+  isLoading: boolean;
+  error: string | null;
+  lastUpdated: string | null;
 }
 
 // Sample data for different tabs
@@ -120,7 +143,78 @@ const imMagicAlertsData = [
   },
 ];
 
-export function IMTable({ activeTab }: IMTableProps) {
+export function IMTable({
+  activeTab,
+  data,
+  isLoading,
+  error,
+  lastUpdated,
+}: IMTableProps) {
+  // Function to get current tab data
+  const getCurrentData = () => {
+    if (!data) return [];
+
+    switch (activeTab) {
+      case "im-alerts":
+        return data.im_alerts || [];
+      case "im-hf-alerts":
+        return data.im_hf_alerts || [];
+      case "im-magic-alerts":
+        return data.im_magic_alerts || [];
+      case "stock-list-filter":
+        // For stock list filter, combine all data or use specific logic
+        return [
+          ...(data.im_alerts || []),
+          ...(data.im_hf_alerts || []),
+          ...(data.im_magic_alerts || []),
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const currentData = getCurrentData();
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-destructive mb-2">Error: {error}</p>
+          <p className="text-muted-foreground text-sm">
+            Please try refreshing the data
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // No data state
+  if (!data || currentData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-muted-foreground">No data available</p>
+          <p className="text-sm text-muted-foreground">
+            Try refreshing to load data
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const renderIMAlertsTable = () => (
     <Table>
       <TableHeader>
@@ -148,7 +242,7 @@ export function IMTable({ activeTab }: IMTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {imAlertsData.map((row, index) => (
+        {currentData.map((row, index) => (
           <TableRow
             key={index}
             className={`transition-colors hover:bg-primary/5 border-b border-border/50 ${
@@ -163,36 +257,39 @@ export function IMTable({ activeTab }: IMTableProps) {
                 {row.symbol}
               </Button>
             </TableCell>
-            <TableCell className="text-muted-foreground">
-              {row.indexOth}
-            </TableCell>
+            <TableCell className="text-muted-foreground">NIFTY 50</TableCell>
             <TableCell className="text-muted-foreground font-mono text-sm">
-              {row.time}
+              {new Date(row.timestamp).toLocaleTimeString()}
             </TableCell>
             <TableCell>
               <Badge
                 variant="secondary"
                 className={`${
-                  row.type.includes("R1")
+                  row.signal.includes("R1")
                     ? "bg-blue-600 text-white border-blue-500"
-                    : row.type.includes("R2")
+                    : row.signal.includes("R2")
                     ? "bg-indigo-600 text-white border-indigo-500"
-                    : row.type.includes("S1")
+                    : row.signal.includes("S1")
                     ? "bg-orange-600 text-white border-orange-500"
-                    : row.type.includes("S2")
+                    : row.signal.includes("S2")
                     ? "bg-red-600 text-white border-red-500"
                     : "bg-primary text-primary-foreground border-primary/30"
                 }`}
               >
-                {row.type}
+                {row.signal}
               </Badge>
             </TableCell>
-            <TableCell className="font-medium">{row.alertDetail}</TableCell>
+            <TableCell className="font-medium">
+              Vol: {row.volume.toLocaleString()} | Change:{" "}
+              {row.change > 0 ? "+" : ""}
+              {row.change} ({row.changePercent > 0 ? "+" : ""}
+              {row.changePercent}%)
+            </TableCell>
             <TableCell className="font-mono text-sm font-semibold text-foreground">
-              {row.ltp}
+              ₹{row.price.toFixed(2)}
             </TableCell>
             <TableCell className="font-mono text-sm text-muted-foreground">
-              {row.baseline}
+              ₹{(row.price - row.change).toFixed(2)}
             </TableCell>
           </TableRow>
         ))}
@@ -227,7 +324,7 @@ export function IMTable({ activeTab }: IMTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {imHfAlertsData.map((row, index) => (
+        {currentData.map((row, index) => (
           <TableRow
             key={index}
             className={`transition-colors hover:bg-primary/5 border-b border-border/50 ${
@@ -252,13 +349,13 @@ export function IMTable({ activeTab }: IMTableProps) {
               <Badge
                 variant="secondary"
                 className={`${
-                  row.type.includes("OCP")
+                  row?.type?.includes("OCP")
                     ? "bg-blue-600 text-white border-blue-500"
-                    : row.type.includes("Matrix")
+                    : row?.type?  .includes("Matrix")
                     ? "bg-purple-600 text-white border-purple-500"
-                    : row.type.includes("Up")
+                    : row?.type?.includes("Up")
                     ? "bg-green-600 text-white border-green-500"
-                    : row.type.includes("Fall")
+                    : row?.type?.includes("Fall")
                     ? "bg-red-600 text-white border-red-500"
                     : "bg-primary text-primary-foreground border-primary/30"
                 }`}
@@ -298,7 +395,7 @@ export function IMTable({ activeTab }: IMTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {imMagicAlertsData.map((row, index) => (
+        {currentData.map((row, index) => (
           <TableRow
             key={index}
             className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}
@@ -382,7 +479,7 @@ export function IMTable({ activeTab }: IMTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {[...imAlertsData, ...imMagicAlertsData].map((row, index) => (
+        {currentData.map((row, index) => (
           <TableRow
             key={index}
             className={index % 2 === 0 ? "bg-background/50" : "bg-secondary/10"}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -61,12 +61,40 @@ type TabType =
   | "im-magic-alerts"
   | "stock-list-filter";
 
+interface AlertData {
+  id: string;
+  timestamp: string;
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  signal: string;
+  [key: string]: any;
+}
+
+interface ApiResponse {
+  im_alerts: AlertData[];
+  im_hf_alerts: AlertData[];
+  im_magic_alerts: AlertData[];
+  timestamp: string;
+}
+
 export function IMDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("im-alerts");
   const [timeInterval, setTimeInterval] = useState("09:00-10:30");
   const [nifty50Enabled, setNifty50Enabled] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  // Data states
+  const [data, setData] = useState<ApiResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Refs for intervals
+  const autoRefreshInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const savedTheme =
@@ -81,6 +109,67 @@ export function IMDashboard() {
     localStorage.setItem("dashboard-theme", newTheme);
     document.documentElement.classList.toggle("light", newTheme === "light");
   };
+
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/data");
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const result: ApiResponse = await response.json();
+      setData(result);
+      setLastUpdated(new Date().toLocaleTimeString());
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Manual refresh function
+  const handleManualRefresh = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Auto refresh effect
+  useEffect(() => {
+    if (autoRefresh) {
+      // Fetch immediately when auto-refresh is enabled
+      fetchData();
+
+      // Set up interval for every 15 seconds
+      autoRefreshInterval.current = setInterval(() => {
+        fetchData();
+      }, 15000);
+    } else {
+      // Clear interval when auto-refresh is disabled
+      if (autoRefreshInterval.current) {
+        clearInterval(autoRefreshInterval.current);
+        autoRefreshInterval.current = null;
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (autoRefreshInterval.current) {
+        clearInterval(autoRefreshInterval.current);
+        autoRefreshInterval.current = null;
+      }
+    };
+  }, [autoRefresh, fetchData]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (!autoRefresh) {
+      fetchData();
+    }
+  }, [fetchData, autoRefresh]);
 
   const tabs = [
     { id: "im-alerts", label: "IM Alerts", icon: TrendingUp },
@@ -241,7 +330,11 @@ export function IMDashboard() {
                 <div className="flex items-center gap-3 bg-secondary/20 rounded-lg px-2 py-2">
                   <div
                     className={`h-2 w-2 rounded-full ${
-                      autoRefresh ? "bg-green-500 animate-pulse" : "bg-muted"
+                      isLoading
+                        ? "bg-blue-500 animate-pulse"
+                        : autoRefresh
+                        ? "bg-green-500 animate-pulse"
+                        : "bg-muted"
                     }`}
                   ></div>
                   <span className="text-sm font-medium text-foreground">
@@ -253,13 +346,20 @@ export function IMDashboard() {
                     onCheckedChange={setAutoRefresh}
                     className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted data-[state=unchecked]:border data-[state=unchecked]:border-border"
                   />
+                  {lastUpdated && (
+                    <span className="text-xs text-muted-foreground">
+                      Last: {lastUpdated}
+                    </span>
+                  )}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={handleManualRefresh}
+                  disabled={isLoading}
                   className="gap-2 bg-card/50 hover:bg-primary hover:text-primary-foreground transition-all duration-200 border-border/50"
                 >
-                  Manual Refresh
+                  {isLoading ? "Refreshing..." : "Manual Refresh"}
                 </Button>
               </div>
             </div>
@@ -277,7 +377,13 @@ export function IMDashboard() {
           {/* Table Content */}
           <div className="px-6 py-6">
             <Card className="overflow-hidden border-border/50 shadow-2xl bg-card/80 backdrop-blur-sm">
-              <IMTable activeTab={activeTab} />
+              <IMTable
+                activeTab={activeTab}
+                data={data}
+                isLoading={isLoading}
+                error={error}
+                lastUpdated={lastUpdated}
+              />
             </Card>
           </div>
         </SidebarInset>
