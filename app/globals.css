@@ -170,4 +170,10 @@
     z-index: 20;
     background-color: var(--card);
   }
+
+  /* Sidebar: force zero padding for NavUser trigger when collapsed (icon) */
+  [data-slot="sidebar"][data-collapsible="icon"]
+    [data-sidebar="menu-button"].navuser-btn {
+    padding: 0 !important;
+  }
 }

@@ -732,3 +732,19 @@ export {
   SidebarTrigger,
   useSidebar,
 };
+
+// Style overrides for collapsed (icon) state
+// Ensures NavUser trigger has no padding when sidebar is collapsed
+// We use a high specificity attribute selector on the wrapper
+// eslint-disable-next-line
+//@ts-ignore
+const _style = (
+  <style>{`
+    [data-slot="sidebar"] [data-sidebar="menu-button"].navuser-btn {
+      padding: 0.5rem; /* default */
+    }
+    [data-slot="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"].navuser-btn {
+      padding: 0 !important;
+    }
+  `}</style>
+);
