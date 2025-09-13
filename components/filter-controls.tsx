@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -24,6 +24,12 @@ interface FilterControlsProps {
   onTimeIntervalChange: (value: string) => void;
   nifty50Enabled: boolean;
   onNifty50Change: (checked: boolean) => void;
+  onFiltersChange?: (filters: {
+    imAlertsType: string;
+    hfFilters: string[];
+    wpFilters: string[];
+    mpFilters: string[];
+  }) => void;
 }
 
 export function FilterControls({
@@ -32,6 +38,7 @@ export function FilterControls({
   onTimeIntervalChange,
   nifty50Enabled,
   onNifty50Change,
+  onFiltersChange,
 }: FilterControlsProps) {
   const [imAlertsType, setImAlertsType] = useState("");
   const [imAlertsSubFilter, setImAlertsSubFilter] = useState("");
@@ -39,6 +46,18 @@ export function FilterControls({
   const [wpFilters, setWpFilters] = useState<string[]>([]);
   const [mpFilters, setMpFilters] = useState<string[]>([]);
   const [selectedStrategy, setSelectedStrategy] = useState("");
+
+  // Notify parent component when filters change
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange({
+        imAlertsType,
+        hfFilters,
+        wpFilters,
+        mpFilters,
+      });
+    }
+  }, [imAlertsType, hfFilters, wpFilters, mpFilters, onFiltersChange]);
 
   const toggleFilter = (
     filterArray: string[],

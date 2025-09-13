@@ -93,6 +93,14 @@ export function IMDashboard() {
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Filter states
+  const [filters, setFilters] = useState({
+    imAlertsType: "",
+    hfFilters: [] as string[],
+    wpFilters: [] as string[],
+    mpFilters: [] as string[],
+  });
+
   // Refs for intervals
   const autoRefreshInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -170,6 +178,19 @@ export function IMDashboard() {
       fetchData();
     }
   }, [fetchData, autoRefresh]);
+
+  // Handle filter changes
+  const handleFiltersChange = useCallback(
+    (newFilters: {
+      imAlertsType: string;
+      hfFilters: string[];
+      wpFilters: string[];
+      mpFilters: string[];
+    }) => {
+      setFilters(newFilters);
+    },
+    []
+  );
 
   const tabs = [
     { id: "im-alerts", label: "IM Alerts", icon: TrendingUp },
@@ -372,6 +393,7 @@ export function IMDashboard() {
             onTimeIntervalChange={setTimeInterval}
             nifty50Enabled={nifty50Enabled}
             onNifty50Change={setNifty50Enabled}
+            onFiltersChange={handleFiltersChange}
           />
 
           {/* Table Content */}
@@ -383,6 +405,8 @@ export function IMDashboard() {
                 isLoading={isLoading}
                 error={error}
                 lastUpdated={lastUpdated}
+                filters={filters}
+                nifty50Enabled={nifty50Enabled}
               />
             </Card>
           </div>

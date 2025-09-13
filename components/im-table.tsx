@@ -43,6 +43,13 @@ interface IMTableProps {
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
+  filters: {
+    imAlertsType: string;
+    hfFilters: string[];
+    wpFilters: string[];
+    mpFilters: string[];
+  };
+  nifty50Enabled: boolean;
 }
 
 // Sample data for different tabs
@@ -149,28 +156,111 @@ export function IMTable({
   isLoading,
   error,
   lastUpdated,
+  filters,
+  nifty50Enabled,
 }: IMTableProps) {
-  // Function to get current tab data
+  // Function to get current tab data with filtering
   const getCurrentData = () => {
     if (!data) return [];
 
+    let rawData: AlertData[] = [];
+
     switch (activeTab) {
       case "im-alerts":
-        return data.im_alerts || [];
+        rawData = data.im_alerts || [];
+        break;
       case "im-hf-alerts":
-        return data.im_hf_alerts || [];
+        rawData = data.im_hf_alerts || [];
+        break;
       case "im-magic-alerts":
-        return data.im_magic_alerts || [];
+        rawData = data.im_magic_alerts || [];
+        break;
       case "stock-list-filter":
-        // For stock list filter, combine all data or use specific logic
-        return [
+        // For stock list filter, combine all data
+        rawData = [
           ...(data.im_alerts || []),
           ...(data.im_hf_alerts || []),
           ...(data.im_magic_alerts || []),
         ];
+        break;
       default:
         return [];
     }
+
+    // Apply filters based on active tab
+    let filteredData = rawData;
+
+    // Apply Nifty 50 filter
+    if (nifty50Enabled) {
+      filteredData = filteredData.filter(
+        (item) => item.indexOth === "Nifty 50"
+      );
+    }
+
+    // Apply tab-specific filters
+    switch (activeTab) {
+      case "im-alerts":
+        if (filters.imAlertsType) {
+          if (filters.imAlertsType === "fii-r") {
+            // Filter for FII-R1 and FII-R2
+            filteredData = filteredData.filter(
+              (item) =>
+                (item.type || item.signal).includes("R1") ||
+                (item.type || item.signal).includes("R2")
+            );
+          } else if (filters.imAlertsType === "fii-s") {
+            // Filter for FII-S1 and FII-S2
+            filteredData = filteredData.filter(
+              (item) =>
+                (item.type || item.signal).includes("S1") ||
+                (item.type || item.signal).includes("S2")
+            );
+          }
+        }
+        break;
+
+      case "im-hf-alerts":
+        if (filters.hfFilters.length > 0) {
+          filteredData = filteredData.filter((item) => {
+            const type = item.type || item.signal;
+            return filters.hfFilters.some((filter) => {
+              switch (filter) {
+                case "OCP/Matrix":
+                  return type.includes("OCP") || type.includes("Matrix");
+                case "Up/Fall":
+                  return type.includes("Up") || type.includes("Fall");
+                case "Point/Value":
+                  return type.includes("Point") || type.includes("Value");
+                default:
+                  return false;
+              }
+            });
+          });
+        }
+        break;
+
+      case "im-magic-alerts":
+        filteredData = filteredData.filter((item) => {
+          let showItem = true;
+
+          // Filter by WP (exclude "Coming" from filters)
+          if (filters.wpFilters.length > 0) {
+            const wpValue = item.wp || item.wpSignal;
+            showItem = showItem && filters.wpFilters.includes(wpValue);
+          }
+
+          // Filter by MP (exclude "Coming" from filters)
+          if (filters.mpFilters.length > 0) {
+            const mpValue = item.mp || item.mpSignal;
+            showItem = showItem && filters.mpFilters.includes(mpValue);
+          }
+
+          return showItem;
+        });
+        break;
+    }
+
+    return filteredData;
   };
 
   const currentData = getCurrentData();
