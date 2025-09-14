@@ -19,10 +19,14 @@ export function IMMagicAlertsTable({
   data,
   symbolSearch,
   onSymbolSearchChange,
+  isLoading,
+  error,
 }: {
   data: AlertData[];
   symbolSearch: string;
   onSymbolSearchChange: (q: string) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -76,6 +80,35 @@ export function IMMagicAlertsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-10 text-center text-muted-foreground"
+                >
+                  <div className="mx-auto mb-3 h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  Loading data...
+                </TableCell>
+              </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-8 text-center text-destructive"
+                >
+                  Error: {error}
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-8 text-center text-muted-foreground"
+                >
+                  No results found
+                </TableCell>
+              </TableRow>
+            ) : null}
             {data.map((row, index) => (
               <TableRow
                 key={`${row.symbol}-${index}`}

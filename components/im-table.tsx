@@ -229,51 +229,13 @@ export function IMTable({
 
   const currentData = getCurrentData();
 
-  // Loading state
-  if (isLoading && !data) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-destructive mb-2">Error: {error}</p>
-          <p className="text-muted-foreground text-sm">
-            Please try refreshing the data
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // No data state
-  if (!data || currentData.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-muted-foreground">No data available</p>
-          <p className="text-sm text-muted-foreground">
-            Try refreshing to load data
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   const renderIMAlertsTable = () => (
     <IMAlertsTable
       data={currentData}
       symbolSearch={symbolSearch}
       onSymbolSearchChange={onSymbolSearchChange}
+      isLoading={isLoading}
+      error={error}
     />
   );
 
@@ -282,6 +244,8 @@ export function IMTable({
       data={currentData}
       symbolSearch={symbolSearch}
       onSymbolSearchChange={onSymbolSearchChange}
+      isLoading={isLoading}
+      error={error}
     />
   );
 
@@ -290,6 +254,8 @@ export function IMTable({
       data={currentData}
       symbolSearch={symbolSearch}
       onSymbolSearchChange={onSymbolSearchChange}
+      isLoading={isLoading}
+      error={error}
     />
   );
 
