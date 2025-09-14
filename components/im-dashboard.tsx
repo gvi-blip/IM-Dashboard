@@ -231,7 +231,7 @@ export function IMDashboard() {
           onThemeChange={setThemeMode}
         />
         {/* Replace main content div with SidebarInset */}
-        <SidebarInset className="flex flex-col h-screen min-h-0">
+        <SidebarInset className="flex flex-col h-screen overflow-hiddenmin-h-0">
           {/* Header */}
           <header className="flex-shrink-0 border-b border-border bg-gradient-to-r from-card via-card to-secondary/10 backdrop-blur-sm">
             <div className="flex items-center justify-between px-6 py-4">
@@ -299,8 +299,8 @@ export function IMDashboard() {
           </div>
 
           {/* Table Content */}
-          <div className="flex-1 min-h-0 px-6 py-6">
-            <Card className="p-0 h-full min-h-0 flex flex-col border border-border shadow-sm bg-card rounded-lg">
+          <div className="flex-1 min-h-0 px-6 py-6 overflow-hidden">
+            <Card className="border-none p-0 h-full min-h-0 flex flex-col shadow-sm bg-card rounded-xl overflow-hidden">
               <IMTable
                 activeTab={activeTab}
                 data={data}
