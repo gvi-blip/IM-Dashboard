@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 
+// Force dynamic responses and disable all caching at the route level
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+export const runtime = "nodejs";
+
 // Mock data structure for demonstration
 interface AlertData {
   id: string;
@@ -485,7 +491,22 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     };
 
-    return NextResponse.json(response);
+    const res = NextResponse.json(response, {
+      headers: {
+        // Ensure no caching by browsers, proxies, or CDNs
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+        Pragma: "no-cache",
+        Expires: "0",
+        "Surrogate-Control": "no-store",
+        // Ensure Vercel/CDN layers do not cache
+        "CDN-Cache-Control": "no-store",
+        "Vercel-CDN-Cache-Control": "no-store",
+      },
+    });
+    // Avoid conditional requests yielding 304 by removing any ETag
+    res.headers.delete("ETag");
+    return res;
   } catch (error) {
     console.error("Error fetching data:", error);
     return NextResponse.json(
