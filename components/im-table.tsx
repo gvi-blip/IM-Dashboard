@@ -230,7 +230,7 @@ export function IMTable({
   const currentData = getCurrentData();
 
   // Loading state
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">

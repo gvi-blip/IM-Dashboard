@@ -89,6 +89,8 @@ export function IMDashboard() {
   // Data states
   const [data, setData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAutoRefreshing, setIsAutoRefreshing] = useState(false);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,41 +138,51 @@ export function IMDashboard() {
   );
 
   // Fetch data function
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchData = useCallback(
+    async (
+      source: "initial" | "auto" | "manual" = "initial",
+      blockUI: boolean = false
+    ) => {
+      if (blockUI) setIsLoading(true);
+      if (source === "auto") setIsAutoRefreshing(true);
+      if (source === "manual") setIsManualRefreshing(true);
+      setError(null);
 
-    try {
-      const response = await fetch("/api/data");
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
+      try {
+        const response = await fetch("/api/data");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const result: ApiResponse = await response.json();
+        setData(result);
+        setLastUpdated(new Date().toLocaleTimeString());
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error instanceof Error ? error.message : "An error occurred");
+      } finally {
+        if (blockUI) setIsLoading(false);
+        if (source === "auto") setIsAutoRefreshing(false);
+        if (source === "manual") setIsManualRefreshing(false);
       }
-
-      const result: ApiResponse = await response.json();
-      setData(result);
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   // Manual refresh function
   const handleManualRefresh = useCallback(() => {
-    fetchData();
+    fetchData("manual");
   }, [fetchData]);
 
   // Auto refresh effect
   useEffect(() => {
     if (autoRefresh) {
       // Fetch immediately when auto-refresh is enabled
-      fetchData();
+      fetchData("auto", false);
 
       // Set up interval for every 15 seconds
       autoRefreshInterval.current = setInterval(() => {
-        fetchData();
+        fetchData("auto", false);
       }, 15000);
     } else {
       // Clear interval when auto-refresh is disabled
@@ -192,7 +204,7 @@ export function IMDashboard() {
   // Initial data fetch
   useEffect(() => {
     if (!autoRefresh) {
-      fetchData();
+      fetchData("initial", true);
     }
   }, [fetchData, autoRefresh]);
 
@@ -251,7 +263,7 @@ export function IMDashboard() {
                 <div className="flex items-center gap-3 bg-secondary/20 rounded-lg px-2 py-2">
                   <div
                     className={`h-2 w-2 rounded-full ${
-                      isLoading
+                      isManualRefreshing || isAutoRefreshing
                         ? "bg-blue-500 animate-pulse"
                         : autoRefresh
                         ? "bg-green-500 animate-pulse"
@@ -277,10 +289,17 @@ export function IMDashboard() {
                   variant="outline"
                   size="sm"
                   onClick={handleManualRefresh}
-                  disabled={isLoading}
+                  disabled={isManualRefreshing}
                   className="gap-2 bg-card/50 hover:bg-primary hover:text-primary-foreground transition-all duration-200 border-border/50"
                 >
-                  {isLoading ? "Refreshing..." : "Manual Refresh"}
+                  {isManualRefreshing ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      Refreshing...
+                    </>
+                  ) : (
+                    "Manual Refresh"
+                  )}
                 </Button>
               </div>
             </div>
