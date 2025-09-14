@@ -53,7 +53,7 @@ function NavUser({
   onThemeChange: (mode: "light" | "dark" | "system") => void;
 }) {
   const { isMobile, open } = useSidebar();
-  console.log(open);
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
