@@ -34,7 +34,7 @@
   --sidebar-foreground: #ffffff; /* Sidebar text color */
   --sidebar-primary: #3b82f6; /* Primary accent for sidebar elements */
   --sidebar-primary-foreground: #ffffff; /* Text color for primary sidebar elements */
-  --sidebar-accent: #f97316; /* Accent for highlighted sidebar items */
+  --sidebar-accent: #334155; /* slate-700: subtle highlight (dark) */
   --sidebar-accent-foreground: #ffffff; /* Text color for sidebar accent items */
   --sidebar-border: #374151; /* Border color for sidebar */
   --sidebar-ring: rgba(59, 130, 246, 0.5); /* Ring color for sidebar focus */
@@ -70,7 +70,7 @@
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f97316;
+  --sidebar-accent: #334155; /* slate-700 */
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #374151;
   --sidebar-ring: rgba(59, 130, 246, 0.5);
@@ -123,5 +123,57 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Light theme tokens to support toggling the `light` class on <html> */
+.light {
+  --background: #fdfdfd; /* softer near-white */
+  --foreground: #0f172a; /* keep readable */
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #1f2937; /* slate-800 */
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc; /* slate-50 */
+  --secondary-foreground: #0f172a;
+  --muted: #94a3b8; /* slate-400 */
+  --muted-foreground: #475569; /* slate-600 */
+  --accent: #3b82f6; /* blue-500 */
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #eef2f7; /* extra soft border */
+  --input: #ffffff;
+  --ring: rgba(59, 130, 246, 0.3);
+  --chart-1: #3b82f6;
+  --chart-2: #f59e0b;
+  --chart-3: #ef4444;
+  --chart-4: #10b981;
+  --chart-5: #8b5cf6;
+  --sidebar: #fdfdfd; /* match page bg */
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef2f7; /* softer hover */
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #eef2f7;
+  --sidebar-ring: rgba(59, 130, 246, 0.25);
+}
+
+@layer utilities {
+  /* Ensure sticky headers across all tables */
+  table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: var(--card);
+  }
+
+  /* Sidebar: force zero padding for NavUser trigger when collapsed (icon) */
+  [data-slot="sidebar"][data-collapsible="icon"]
+    [data-sidebar="menu-button"].navuser-btn {
+    padding: 0 !important;
   }
 }

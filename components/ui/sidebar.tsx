@@ -495,24 +495,31 @@ const sidebarMenuButtonVariants = cva(
   }
 );
 
-function SidebarMenuButton({
-  asChild = false,
-  isActive = false,
-  variant = "default",
-  size = "default",
-  tooltip,
-  className,
-  ...props
-}: React.ComponentProps<"button"> & {
-  asChild?: boolean;
-  isActive?: boolean;
-  tooltip?: string | React.ComponentProps<typeof TooltipContent>;
-} & VariantProps<typeof sidebarMenuButtonVariants>) {
-  const Comp = asChild ? Slot : "button";
+const SidebarMenuButton = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<"button"> & {
+    asChild?: boolean;
+    isActive?: boolean;
+    tooltip?: string | React.ComponentProps<typeof TooltipContent>;
+  } & VariantProps<typeof sidebarMenuButtonVariants>
+>(function SidebarMenuButton(
+  {
+    asChild = false,
+    isActive = false,
+    variant = "default",
+    size = "default",
+    tooltip,
+    className,
+    ...props
+  },
+  ref
+) {
+  const Comp: any = asChild ? Slot : "button";
   const { isMobile, state } = useSidebar();
 
   const button = (
     <Comp
+      ref={ref}
       data-slot="sidebar-menu-button"
       data-sidebar="menu-button"
       data-size={size}
@@ -526,10 +533,11 @@ function SidebarMenuButton({
     return button;
   }
 
+  let tooltipProps: React.ComponentProps<typeof TooltipContent> | undefined;
   if (typeof tooltip === "string") {
-    tooltip = {
-      children: tooltip,
-    };
+    tooltipProps = { children: tooltip } as any;
+  } else {
+    tooltipProps = tooltip as any;
   }
 
   return (
@@ -539,11 +547,11 @@ function SidebarMenuButton({
         side="right"
         align="center"
         hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
+        {...tooltipProps}
       />
     </Tooltip>
   );
-}
+});
 
 function SidebarMenuAction({
   className,
@@ -724,3 +732,19 @@ export {
   SidebarTrigger,
   useSidebar,
 };
+
+// Style overrides for collapsed (icon) state
+// Ensures NavUser trigger has no padding when sidebar is collapsed
+// We use a high specificity attribute selector on the wrapper
+// eslint-disable-next-line
+//@ts-ignore
+const _style = (
+  <style>{`
+    [data-slot="sidebar"] [data-sidebar="menu-button"].navuser-btn {
+      padding: 0.5rem; /* default */
+    }
+    [data-slot="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"].navuser-btn {
+      padding: 0 !important;
+    }
+  `}</style>
+);
