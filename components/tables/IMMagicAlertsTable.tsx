@@ -80,17 +80,7 @@ export function IMMagicAlertsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="py-10 text-center text-muted-foreground"
-                >
-                  <div className="mx-auto mb-3 h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  Loading data...
-                </TableCell>
-              </TableRow>
-            ) : error ? (
+            {error ? (
               <TableRow>
                 <TableCell
                   colSpan={4}
@@ -100,14 +90,26 @@ export function IMMagicAlertsTable({
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="py-8 text-center text-muted-foreground"
-                >
-                  No results found
-                </TableCell>
-              </TableRow>
+              isLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="py-10 text-center text-muted-foreground"
+                  >
+                    <div className="mx-auto mb-3 h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    Loading data...
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    No results found
+                  </TableCell>
+                </TableRow>
+              )
             ) : null}
             {data.map((row, index) => (
               <TableRow
