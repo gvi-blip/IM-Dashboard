@@ -88,7 +88,7 @@ export function IMDashboard() {
 
   // Data states
   const [data, setData] = useState<ApiResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(false);
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
