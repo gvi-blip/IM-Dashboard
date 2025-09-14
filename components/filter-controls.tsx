@@ -106,11 +106,15 @@ export function FilterControls({
     <div className="flex items-center gap-4 ml-auto">
       <div className="flex items-center gap-3 bg-secondary/10 rounded-lg px-3 py-1.5 border border-border/50">
         <Clock className="h-5 w-5 text-primary" />
-        <Select value={timeInterval} onValueChange={onTimeIntervalChange}>
-          <SelectTrigger className="w-44 bg-background border-border">
-            <SelectValue />
+        <Select
+          value={timeInterval}
+          onValueChange={(v) => onTimeIntervalChange(v === "clear" ? "" : v)}
+        >
+          <SelectTrigger className="w-48 bg-background border-border">
+            <SelectValue placeholder="Time: All" />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
+            <SelectItem value="clear">All</SelectItem>
             <SelectItem value="09:00-10:30">09:00-10:30</SelectItem>
             <SelectItem value="10:30-12:00">10:30-12:00</SelectItem>
             <SelectItem value="12:00-14:00">12:00-14:00</SelectItem>

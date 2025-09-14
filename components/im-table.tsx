@@ -36,6 +36,7 @@ interface IMTableProps {
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
+  timeInterval?: string;
   filters: {
     imAlertsType: string;
     hfFilters: string[];
@@ -53,6 +54,7 @@ export function IMTable({
   isLoading,
   error,
   lastUpdated,
+  timeInterval,
   filters,
   nifty50Enabled,
   symbolSearch,
@@ -86,6 +88,47 @@ export function IMTable({
         break;
       default:
         return [];
+    }
+
+    // Apply time interval filter if provided (expects format "HH:MM-HH:MM")
+    const parseTimeToMinutes = (value: string): number | null => {
+      if (!value) return null;
+      const trimmed = value.trim();
+      const match = trimmed.match(/^(\d{1,2}):(\d{2})(?:\s*([AP]M))?$/i);
+      if (!match) return null;
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const ampm = match[3]?.toUpperCase();
+      if (ampm === "PM" && hours < 12) hours += 12;
+      if (ampm === "AM" && hours === 12) hours = 0;
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+      return hours * 60 + minutes;
+    };
+
+    const getItemMinutes = (item: AlertData): number | null => {
+      if (item.time && typeof item.time === "string") {
+        const m = parseTimeToMinutes(item.time);
+        if (m !== null) return m;
+      }
+      if (item.timestamp) {
+        const d = new Date(item.timestamp);
+        if (!isNaN(d.getTime())) {
+          return d.getHours() * 60 + d.getMinutes();
+        }
+      }
+      return null;
+    };
+
+    if (timeInterval && timeInterval.includes("-")) {
+      const [startStr, endStr] = timeInterval.split("-");
+      const start = parseTimeToMinutes(startStr);
+      const end = parseTimeToMinutes(endStr);
+      if (start !== null && end !== null) {
+        rawData = rawData.filter((item) => {
+          const m = getItemMinutes(item as any);
+          return m !== null && m >= start && m <= end;
+        });
+      }
     }
 
     // Apply filters based on active tab

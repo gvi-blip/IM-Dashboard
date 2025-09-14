@@ -78,7 +78,7 @@ interface ApiResponse {
 
 export function IMDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("im-alerts");
-  const [timeInterval, setTimeInterval] = useState("09:00-10:30");
+  const [timeInterval, setTimeInterval] = useState("");
   const [nifty50Enabled, setNifty50Enabled] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "system">("dark");
@@ -307,6 +307,7 @@ export function IMDashboard() {
                 isLoading={isLoading}
                 error={error}
                 lastUpdated={lastUpdated}
+                timeInterval={timeInterval}
                 filters={filters}
                 nifty50Enabled={nifty50Enabled}
                 symbolSearch={symbolSearch}
