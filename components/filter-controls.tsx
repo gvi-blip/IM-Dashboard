@@ -3,14 +3,18 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
-import { Filter, X, Clock } from "lucide-react";
+import { Filter, X, Clock, ChevronsUpDown, Check } from "lucide-react";
 
 type TabType =
   | "im-alerts"
@@ -20,8 +24,8 @@ type TabType =
 
 interface FilterControlsProps {
   activeTab: TabType;
-  timeInterval: string;
-  onTimeIntervalChange: (value: string) => void;
+  timeInterval: string[];
+  onTimeIntervalChange: (value: string[]) => void;
   nifty50Enabled: boolean;
   onNifty50Change: (checked: boolean) => void;
   onFiltersChange?: (filters: {
@@ -46,6 +50,7 @@ export function FilterControls({
   const [wpFilters, setWpFilters] = useState<string[]>([]);
   const [mpFilters, setMpFilters] = useState<string[]>([]);
   const [selectedStrategy, setSelectedStrategy] = useState("");
+  const [timeMenuOpen, setTimeMenuOpen] = useState(false);
 
   // Notify parent component when filters change
   useEffect(() => {
@@ -102,25 +107,108 @@ export function FilterControls({
     }
   };
 
+  const timeOptions = [
+    "09:00-10:30",
+    "10:30-12:00",
+    "12:00-14:00",
+    "14:00-15:30",
+  ];
+
+  const parseTimeToMinutes = (value: string): number | null => {
+    const match = value.match(/^(\d{1,2}):(\d{2})$/);
+    if (!match) return null;
+    let hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+    return hours * 60 + minutes;
+  };
+
+  const getTimeRangeLabel = (ranges: string[]): string => {
+    if (!ranges || ranges.length === 0) return "Time: All";
+    let minStart: number | null = null;
+    let maxEnd: number | null = null;
+    for (const r of ranges) {
+      if (!r.includes("-")) continue;
+      const [startStr, endStr] = r.split("-");
+      const s = parseTimeToMinutes(startStr);
+      const e = parseTimeToMinutes(endStr);
+      if (s !== null) minStart = minStart === null ? s : Math.min(minStart, s);
+      if (e !== null) maxEnd = maxEnd === null ? e : Math.max(maxEnd, e);
+    }
+    if (minStart === null || maxEnd === null)
+      return `Time: ${ranges.join(", ")}`;
+    const format = (m: number) => {
+      const h = Math.floor(m / 60);
+      const mm = m % 60;
+      const hh = h.toString().padStart(2, "0");
+      const mmStr = mm.toString().padStart(2, "0");
+      return `${hh}:${mmStr}`;
+    };
+    return `Time: ${format(minStart)} - ${format(maxEnd)}`;
+  };
+
   const renderRightControls = () => (
     <div className="flex items-center gap-4 ml-auto">
       <div className="flex items-center gap-3 bg-secondary/10 rounded-lg px-3 py-1.5 border border-border/50">
         <Clock className="h-5 w-5 text-primary" />
-        <Select
-          value={timeInterval}
-          onValueChange={(v) => onTimeIntervalChange(v === "clear" ? "" : v)}
-        >
-          <SelectTrigger className="w-48 bg-background border-border">
-            <SelectValue placeholder="Time: All" />
-          </SelectTrigger>
-          <SelectContent className="bg-card border-border">
-            <SelectItem value="clear">All</SelectItem>
-            <SelectItem value="09:00-10:30">09:00-10:30</SelectItem>
-            <SelectItem value="10:30-12:00">10:30-12:00</SelectItem>
-            <SelectItem value="12:00-14:00">12:00-14:00</SelectItem>
-            <SelectItem value="14:00-15:30">14:00-15:30</SelectItem>
-          </SelectContent>
-        </Select>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-w-48 justify-between bg-background border-border"
+            >
+              <span className="truncate">
+                {getTimeRangeLabel(timeInterval)}
+              </span>
+              <ChevronsUpDown className="ml-2 h-4 w-4 opacity-60" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="end"
+            className="w-60 bg-card border border-border p-2 z-50"
+          >
+            <button
+              className="w-full text-left px-2 py-1.5 rounded hover:bg-secondary/20 text-sm"
+              onClick={() => onTimeIntervalChange([])}
+            >
+              All
+            </button>
+            <div className="mt-1 space-y-1">
+              {timeOptions.map((opt) => {
+                const checked = timeInterval.includes(opt);
+                return (
+                  <button
+                    type="button"
+                    key={opt}
+                    className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-secondary/20 text-sm"
+                    onClick={() =>
+                      onTimeIntervalChange(
+                        checked
+                          ? timeInterval.filter((t) => t !== opt)
+                          : [...timeInterval, opt]
+                      )
+                    }
+                  >
+                    <span>{opt}</span>
+                    <span
+                      className={
+                        "ml-3 flex items-center justify-center h-4 w-4 rounded border " +
+                        (checked
+                          ? "bg-primary border-primary"
+                          : "bg-background border-border")
+                      }
+                    >
+                      {checked ? (
+                        <Check className="h-3.5 w-3.5 text-white" />
+                      ) : null}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="flex items-center gap-4 bg-secondary/10 rounded-lg px-4 py-2 border border-border/50">

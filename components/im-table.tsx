@@ -36,7 +36,7 @@ interface IMTableProps {
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
-  timeInterval?: string;
+  timeInterval?: string[];
   filters: {
     imAlertsType: string;
     hfFilters: string[];
@@ -119,14 +119,26 @@ export function IMTable({
       return null;
     };
 
-    if (timeInterval && timeInterval.includes("-")) {
-      const [startStr, endStr] = timeInterval.split("-");
-      const start = parseTimeToMinutes(startStr);
-      const end = parseTimeToMinutes(endStr);
-      if (start !== null && end !== null) {
+    if (
+      timeInterval &&
+      Array.isArray(timeInterval) &&
+      timeInterval.length > 0
+    ) {
+      const ranges: Array<{ start: number; end: number }> = [];
+      for (const rangeStr of timeInterval) {
+        if (!rangeStr.includes("-")) continue;
+        const [startStr, endStr] = rangeStr.split("-");
+        const start = parseTimeToMinutes(startStr);
+        const end = parseTimeToMinutes(endStr);
+        if (start !== null && end !== null) {
+          ranges.push({ start, end });
+        }
+      }
+      if (ranges.length > 0) {
         rawData = rawData.filter((item) => {
           const m = getItemMinutes(item as any);
-          return m !== null && m >= start && m <= end;
+          if (m === null) return false;
+          return ranges.some(({ start, end }) => m >= start && m <= end);
         });
       }
     }
