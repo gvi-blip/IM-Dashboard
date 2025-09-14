@@ -83,6 +83,9 @@ export function IMDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "system">("dark");
 
+  // Symbol search mapped to tab (simple single value that resets on tab change)
+  const [symbolSearch, setSymbolSearch] = useState("");
+
   // Data states
   const [data, setData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -193,6 +196,11 @@ export function IMDashboard() {
     }
   }, [fetchData, autoRefresh]);
 
+  // Reset symbol search on tab change
+  useEffect(() => {
+    setSymbolSearch("");
+  }, [activeTab]);
+
   // Handle filter changes
   const handleFiltersChange = useCallback(
     (newFilters: {
@@ -301,6 +309,8 @@ export function IMDashboard() {
                 lastUpdated={lastUpdated}
                 filters={filters}
                 nifty50Enabled={nifty50Enabled}
+                symbolSearch={symbolSearch}
+                onSymbolSearchChange={setSymbolSearch}
               />
             </Card>
           </div>

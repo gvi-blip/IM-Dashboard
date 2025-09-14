@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import React from "react";
 
 type TabType =
   | "im-alerts"
@@ -50,6 +52,8 @@ interface IMTableProps {
     mpFilters: string[];
   };
   nifty50Enabled: boolean;
+  symbolSearch: string;
+  onSymbolSearchChange: (q: string) => void;
 }
 
 // Sample data for different tabs
@@ -158,7 +162,11 @@ export function IMTable({
   lastUpdated,
   filters,
   nifty50Enabled,
+  symbolSearch,
+  onSymbolSearchChange,
 }: IMTableProps) {
+  const [symbolSearchOpen, setSymbolSearchOpen] = React.useState(false);
+
   // Function to get current tab data with filtering
   const getCurrentData = () => {
     if (!data) return [];
@@ -194,6 +202,14 @@ export function IMTable({
     if (nifty50Enabled) {
       filteredData = filteredData.filter(
         (item) => item.indexOth === "Nifty 50"
+      );
+    }
+
+    // Apply symbol search (case-insensitive, startsWith or includes)
+    if (symbolSearch.trim()) {
+      const q = symbolSearch.trim().toLowerCase();
+      filteredData = filteredData.filter((item) =>
+        (item.symbol || "").toLowerCase().includes(q)
       );
     }
 
@@ -321,12 +337,42 @@ export function IMTable({
           <TableHeader>
             <TableRow className="border-b border-border bg-[hsl(var(--secondary))]">
               <TableHead className="font-semibold text-foreground rounded-tl-lg">
-                <Button
-                  variant="ghost"
-                  className="h-auto p-0 font-semibold text-foreground hover:text-primary transition-colors"
-                >
-                  Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!symbolSearchOpen ? (
+                    <span>Symbol</span>
+                  ) : (
+                    <Input
+                      value={symbolSearch}
+                      onChange={(e) => onSymbolSearchChange(e.target.value)}
+                      onBlur={() => {
+                        if (!symbolSearch.trim()) setSymbolSearchOpen(false);
+                      }}
+                      placeholder="Search symbol"
+                      className="h-8 w-40 text-sm"
+                      autoFocus
+                    />
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground"
+                    onClick={() => {
+                      if (symbolSearchOpen) {
+                        onSymbolSearchChange("");
+                        setSymbolSearchOpen(false);
+                      } else {
+                        setSymbolSearchOpen(true);
+                      }
+                    }}
+                    title={symbolSearchOpen ? "Clear search" : "Search symbol"}
+                  >
+                    {symbolSearchOpen ? (
+                      <X className="h-4 w-4" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </TableHead>
               <TableHead className="font-semibold text-foreground">
                 Index & Oth
@@ -434,14 +480,44 @@ export function IMTable({
             <col />
           </colgroup>
           <TableHeader>
-            <TableRow className="border-b border-border">
+            <TableRow className="border-b border-border bg-[hsl(var(--secondary))]">
               <TableHead className="font-semibold text-foreground rounded-tl-lg">
-                <Button
-                  variant="ghost"
-                  className="h-auto p-0 font-semibold text-foreground hover:text-primary transition-colors"
-                >
-                  Symbol <ArrowUpDown className="ml-1 h-3 w-3" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!symbolSearchOpen ? (
+                    <span>Symbol</span>
+                  ) : (
+                    <Input
+                      value={symbolSearch}
+                      onChange={(e) => onSymbolSearchChange(e.target.value)}
+                      onBlur={() => {
+                        if (!symbolSearch.trim()) setSymbolSearchOpen(false);
+                      }}
+                      placeholder="Search symbol"
+                      className="h-8 w-40 text-sm"
+                      autoFocus
+                    />
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground"
+                    onClick={() => {
+                      if (symbolSearchOpen) {
+                        onSymbolSearchChange("");
+                        setSymbolSearchOpen(false);
+                      } else {
+                        setSymbolSearchOpen(true);
+                      }
+                    }}
+                    title={symbolSearchOpen ? "Clear search" : "Search symbol"}
+                  >
+                    {symbolSearchOpen ? (
+                      <X className="h-4 w-4" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </TableHead>
               <TableHead className="font-semibold text-foreground">
                 Index & Oth
@@ -463,17 +539,6 @@ export function IMTable({
               </TableHead>
             </TableRow>
           </TableHeader>
-        </Table>
-        <Table className="w-full">
-          <colgroup>
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-          </colgroup>
           <TableBody>
             {currentData.map((row, index) => (
               <TableRow
@@ -559,7 +624,42 @@ export function IMTable({
           <TableHeader>
             <TableRow className="border-b border-border">
               <TableHead className="font-semibold text-foreground rounded-tl-lg">
-                Symbol
+                <div className="flex items-center gap-2">
+                  {!symbolSearchOpen ? (
+                    <span>Symbol</span>
+                  ) : (
+                    <Input
+                      value={symbolSearch}
+                      onChange={(e) => onSymbolSearchChange(e.target.value)}
+                      onBlur={() => {
+                        if (!symbolSearch.trim()) setSymbolSearchOpen(false);
+                      }}
+                      placeholder="Search symbol"
+                      className="h-8 w-40 text-sm"
+                      autoFocus
+                    />
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground"
+                    onClick={() => {
+                      if (symbolSearchOpen) {
+                        onSymbolSearchChange("");
+                        setSymbolSearchOpen(false);
+                      } else {
+                        setSymbolSearchOpen(true);
+                      }
+                    }}
+                    title={symbolSearchOpen ? "Clear search" : "Search symbol"}
+                  >
+                    {symbolSearchOpen ? (
+                      <X className="h-4 w-4" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </TableHead>
               <TableHead className="font-semibold text-foreground">
                 Index & Oth
@@ -572,14 +672,6 @@ export function IMTable({
               </TableHead>
             </TableRow>
           </TableHeader>
-        </Table>
-        <Table className="w-full">
-          <colgroup>
-            <col />
-            <col />
-            <col />
-            <col />
-          </colgroup>
           <TableBody>
             {currentData.map((row, index) => (
               <TableRow
